@@ -1,5 +1,2 @@
-*
-!/config
-!/src
-!README.md
-!.gitignore
+/checkpoint
+/data

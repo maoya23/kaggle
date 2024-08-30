@@ -1,0 +1,8 @@
+batchsize: 256
+checkpoint_path: ../checkpoint
+device: cuda
+epoch: 50
+lr: 0.001
+output_path: ../data/output
+test_path: ../data/input/test
+train_path: ../data/input/train
