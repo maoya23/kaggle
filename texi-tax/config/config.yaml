@@ -6,3 +6,23 @@ lr: 0.001
 output_path: ../data/output
 test_path: ../data/input/test
 train_path: ../data/input/train
+
+lgb_params : {
+        'boosting_type':'gbdt',
+        'objective': 'regression',
+        'nthread': -1,
+        'verbose': 0,
+        'num_leaves': 31,
+        'learning_rate': 0.05,
+        'max_depth': -1,
+        'subsample': 0.8,
+        'subsample_freq': 1,
+        'colsample_bytree': 0.6,
+        'reg_alpha': 1,
+        'reg_lambda': 0.001,
+        'metric': 'rmse',
+        'min_split_gain': 0.5,
+        'min_child_weight': 1,
+        'min_child_samples': 10,
+        'scale_pos_weight':1     
+    }

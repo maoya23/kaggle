@@ -22,11 +22,8 @@ if not file_path_obj.exists():
     file_path_obj.touch(exist_ok=True)
 
 code_ignore='''
-*
-!/config
-!/src
-!README.md
-!.gitignore
+/checkpoint
+/data
 '''
 
 with open(competition_name+'/.gitignore','w') as f:
@@ -112,27 +109,59 @@ import os
 import urllib.request
 import zipfile
 import requests
+import kaggle
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+import glob 
+from kaggle.api.kaggle_api_extended import KaggleApi
+import zipfile
+import shutil
+from zipfile import ZipFile
+import subprocess
+import os
+import yaml
 
 
-url="https://download.pytorch.org/tutorial/hymenoptera_data.zip"
-urlData = requests.get(url).content
-file_path='../data/input/train.zip'
+with open('../config/config.yaml', 'r') as f:
+    config = yaml.safe_load(f)
 
-with open(file_path, 'wb') as f:
-    response = requests.get(url, stream=True)
-    if response.status_code == 200:
-        for chunk in response.iter_content(1024):
-            f.write(chunk)
-    else:
-        print(f"Download failed. Status code: {response.status_code}")
 
-if os.path.exists(file_path):
-  with zipfile.ZipFile(file_path) as existing_zip:
-    existing_zip.extractall('../data/input')
-else:
-  print(f"The file {file_path} does not exist.")
 
-os.remove('../data/input/train.zip')
+# ダウンロード先ディレクトリの作成
+os.makedirs('/data/input/train', exist_ok=True)
+
+# Kaggleコマンドの実行
+kaggle_command = 'kaggle competitions download -c hatena -p /data/input/train'
+subprocess.run(kaggle_command, shell=True, check=True)
+
+print('データのダウンロードが完了しました。')
+
+
+
+api=KaggleApi()
+api.authenticate()
+
+output_path=config['train_path']
+
+api.competition_download_file('recruit-restaurant-visitor-forecasting',
+    'air_reserve.csv.zip', path=output_path)
+
+shutil.unpack_archive(config['train_path']+'/'+'recruit-restaurant-visitor-forecasting.zip',config['train_path'])
+
+
+
+files = glob.glob(os.path.join(config['train_path'], '*zip'))
+from tqdm import tqdm
+
+for item in tqdm(files, desc="ZIPファイルの解凍"):
+    with ZipFile(item) as zip_file:
+        zip_file.extractall(config['train_path'])
+
+zip_files = glob.glob(os.path.join(config['train_path'], '*.zip'))
+for zip_file in tqdm(zip_files, desc="ZIPファイルの削除"):
+    os.remove(zip_file)
+    print(f"{zip_file}を削除しました。")
 '''
 
 with open(competition_name+'/src/DataDownload.py','w') as f:
